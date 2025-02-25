@@ -1,13 +1,13 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QVBoxLayout, QWidget
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt5.QtGui import QIcon, QFont, QPixmap
 from PyQt5.QtCore import Qt
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Extractor de Estados de Cuenta")
-        self.setGeometry(200, 200, 450, 350)
-        self.setFixedSize(450, 350)  
+        self.setGeometry(200, 200, 500, 400)
+        self.setFixedSize(500, 400)  
         self.setWindowIcon(QIcon("heza_logo.jpg"))
 
         # Estilos CSS para la interfaz
@@ -46,14 +46,26 @@ class MainWindow(QMainWindow):
         font.setPointSize(12)
 
         # Etiqueta principal
-        self.label = QLabel("Carga un estado de cuenta en PDF", self)
+        self.label = QLabel("Selecciona el banco y carga un estado de cuenta en PDF", self)
         self.label.setFont(font)
         self.label.setAlignment(Qt.AlignCenter)
+
+        # Botones para seleccionar el banco
+        self.btn_bbva = QPushButton("BBVA", self)
+        self.btn_bbva.setIcon(QIcon("bbva_icon.png"))  # Asegúrate de tener un icono para BBVA
+        self.btn_bbva.setFont(font)
+        self.btn_bbva.clicked.connect(lambda: self.select_bank("BBVA"))
+
+        # Layout para los botones de bancos
+        bank_layout = QHBoxLayout()
+        bank_layout.addWidget(self.btn_bbva)
+        # Aquí puedes agregar más botones para otros bancos en el futuro
 
         # Botón para seleccionar archivo
         self.btn_select_file = QPushButton("Seleccionar PDF", self)
         self.btn_select_file.setFont(font)
         self.btn_select_file.clicked.connect(self.load_pdf)
+        self.btn_select_file.setEnabled(False)  # Deshabilitado hasta que se seleccione un banco
 
         # Botón para exportar a Excel
         self.btn_export_excel = QPushButton("Exportar a Excel", self)
@@ -64,6 +76,7 @@ class MainWindow(QMainWindow):
         # Diseño de la ventana
         layout = QVBoxLayout()
         layout.addWidget(self.label)
+        layout.addLayout(bank_layout)
         layout.addWidget(self.btn_select_file)
         layout.addWidget(self.btn_export_excel)
         layout.setSpacing(20)
@@ -74,9 +87,15 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         self.file_path = None
+        self.selected_bank = None
 
         # Habilitar arrastrar y soltar
         self.setAcceptDrops(True)
+
+    def select_bank(self, bank):
+        self.selected_bank = bank
+        self.label.setText(f"Banco seleccionado: {bank}\nCarga un estado de cuenta en PDF")
+        self.btn_select_file.setEnabled(True)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -100,13 +119,13 @@ class MainWindow(QMainWindow):
             self.btn_export_excel.setEnabled(True)
 
     def export_to_excel(self):
-        if self.file_path:
+        if self.file_path and self.selected_bank:
             from extractor import PDFExtractor
-            extractor = PDFExtractor(self.file_path)
+            extractor = PDFExtractor(self.file_path, self.selected_bank)
             data = extractor.extract_data()
 
             # Nombre por defecto del archivo
-            default_file_name = "estado_de_cuenta.xlsx"
+            default_file_name = f"estado_de_cuenta_{self.selected_bank}.xlsx"
             
             # Configurar el diálogo de guardado con el nombre por defecto
             save_path, _ = QFileDialog.getSaveFileName(
