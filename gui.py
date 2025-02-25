@@ -6,8 +6,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Extractor de Estados de Cuenta")
-        self.setGeometry(200, 200, 500, 400)
-        self.setFixedSize(500, 400)  
+        self.setGeometry(200, 200, 600, 450)  # Ajustar tamaño de la ventana
+        self.setFixedSize(600, 450)  # Tamaño fijo para mejor responsividad
         self.setWindowIcon(QIcon("heza_logo.jpg"))
 
         # Estilos CSS para la interfaz
@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
                 background-color: #f0f0f0;
             }
             QLabel {
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: bold;
                 color: #333333;
                 margin-bottom: 20px;
@@ -24,12 +24,12 @@ class MainWindow(QMainWindow):
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: bold;
-                padding: 10px 20px;
-                border-radius: 5px;
+                padding: 15px 30px;
+                border-radius: 10px;
                 border: none;
-                margin: 5px;
+                margin: 10px;
             }
             QPushButton:hover {
                 background-color: #45a049;
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         # Fuente personalizada
         font = QFont()
         font.setFamily("Arial")
-        font.setPointSize(12)
+        font.setPointSize(14)
 
         # Etiqueta principal
         self.label = QLabel("Selecciona el banco y carga un estado de cuenta en PDF", self)
@@ -52,14 +52,31 @@ class MainWindow(QMainWindow):
 
         # Botones para seleccionar el banco
         self.btn_bbva = QPushButton("BBVA", self)
-        self.btn_bbva.setIcon(QIcon("bbva_icon.png"))  # Asegúrate de tener un icono para BBVA
+        self.btn_bbva.setIcon(QIcon("bbva_icon.png"))  # Icono para BBVA
         self.btn_bbva.setFont(font)
         self.btn_bbva.clicked.connect(lambda: self.select_bank("BBVA"))
+
+        self.btn_banco_bajio = QPushButton("Banco del Bajío", self)
+        self.btn_banco_bajio.setIcon(QIcon("banco_bajio_icon.png"))  # Icono para Banco del Bajío
+        self.btn_banco_bajio.setFont(font)
+        self.btn_banco_bajio.clicked.connect(lambda: self.select_bank("Banco del Bajío"))
+
+        self.btn_scotiabank = QPushButton("Scotiabank", self)
+        self.btn_scotiabank.setIcon(QIcon("scotiabank_icon.png"))  # Icono para Scotiabank
+        self.btn_scotiabank.setFont(font)
+        self.btn_scotiabank.clicked.connect(lambda: self.select_bank("Scotiabank"))
+
+        self.btn_banorte = QPushButton("Banorte", self)
+        self.btn_banorte.setIcon(QIcon("banorte_icon.png"))  # Icono para Banorte
+        self.btn_banorte.setFont(font)
+        self.btn_banorte.clicked.connect(lambda: self.select_bank("Banorte"))
 
         # Layout para los botones de bancos
         bank_layout = QHBoxLayout()
         bank_layout.addWidget(self.btn_bbva)
-        # Aquí puedes agregar más botones para otros bancos en el futuro
+        bank_layout.addWidget(self.btn_banco_bajio)
+        bank_layout.addWidget(self.btn_scotiabank)
+        bank_layout.addWidget(self.btn_banorte)
 
         # Botón para seleccionar archivo
         self.btn_select_file = QPushButton("Seleccionar PDF", self)
