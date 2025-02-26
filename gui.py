@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QVBoxLayout, QWidget, QHBoxLayout
-from PyQt5.QtGui import QIcon, QFont, QPixmap
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Extractor de Estados de Cuenta")
-        self.setGeometry(200, 200, 600, 450)  # Ajustar tamaño de la ventana
-        self.setFixedSize(600, 450)  # Tamaño fijo para mejor responsividad
+        self.setGeometry(200, 200, 600, 450)
+        self.setFixedSize(600, 450)
         self.setWindowIcon(QIcon("heza_logo.jpg"))
 
-        # Estilos CSS para la interfaz
+        # Estilos CSS mejorados
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #f0f0f0;
@@ -20,30 +20,34 @@ class MainWindow(QMainWindow):
                 font-weight: bold;
                 color: #333333;
                 margin-bottom: 20px;
+                text-align: center;
             }
             QPushButton {
-                background-color: #4CAF50;
+                background-color: #2196F3;  /* Azul profesional */
                 color: white;
-                font-size: 16px;
+                font-size: 14px;  /* Tamaño de letra ajustado */
                 font-weight: bold;
-                padding: 15px 30px;
-                border-radius: 10px;
-                border: none;
-                margin: 10px;
+                padding: 12px -4px;
+                border-radius: 8px;
+                border: 2px solid #1976D2;  /* Borde para mejor contraste */
+                margin: 5px;
+                text-align: center;
+                min-width: 140px;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: #1976D2;  /* Azul más oscuro al pasar el mouse */
             }
             QPushButton:disabled {
-                background-color: #cccccc;
-                color: #666666;
+                background-color: #BBDEFB;  /* Azul claro para deshabilitados */
+                color: #757575;
+                border: 2px solid #90CAF9;
             }
         """)
 
         # Fuente personalizada
         font = QFont()
         font.setFamily("Arial")
-        font.setPointSize(14)
+        font.setPointSize(12)
 
         # Etiqueta principal
         self.label = QLabel("Selecciona el banco y carga un estado de cuenta en PDF", self)
