@@ -14,6 +14,8 @@ class PDFExtractor:
             return self.extract_banco_bajio_data()
         elif self.bank == "Scotiabank":
             return self.extract_scotiabank_data()
+        elif self.bank == "BBASE":
+            return self.extract_bbase_data()
         elif self.bank == "Banorte":
             return self.extract_banorte_data()
         else:
@@ -122,6 +124,41 @@ class PDFExtractor:
                 data["Resumen Financiero"]["Saldo Inicial"] = line.split(":")[1].strip()
             if "Saldo final" in line and ":" in line:
                 data["Resumen Financiero"]["Saldo Final"] = line.split(":")[1].strip()
+                
+    def extract_bbase_data(self):
+        data = {"Información General": {}, "Transacciones": [], "Resumen Financiero": {}}
+        with pdfplumber.open(self.file_path) as pdf:
+            for page in pdf.pages:
+             text = page.extract_text()
+             if text:
+                    self.process_bbase_text(text, data)
+            return data
+        
+    def process_bbase_text(self, text, data):
+        lines = text.split("\n")
+        for line in lines:
+            # Extraer información general
+            if "Número de Cuenta" in line and ":" in line:
+                data["Información General"]["Número de Cuenta"] = line.split(":")[1].strip()
+            if "RFC" in line and ":" in line:
+                data["Información General"]["RFC"] = line.split(":")[1].strip()
+
+            # Extraer transacciones
+            if re.match(r"\d{2}-\w{3}-\d{2}", line):  # Fecha en formato DD-MMM-AA
+                parts = line.split()
+                if len(parts) >= 5:
+                    fecha = parts[0]
+                    concepto = " ".join(parts[1:-3])
+                    cargo = parts[-3] if parts[-3].replace(",", "").replace(".", "").isdigit() else "0"
+                    abonos = parts[-2] if parts[-2].replace(",", "").replace(".", "").isdigit() else "0"
+                    saldo = parts[-1] if parts[-1].replace(",", "").replace(".", "").isdigit() else "0"
+                    data["Transacciones"].append([fecha, concepto, cargo, abonos, saldo])
+
+            # Extraer resumen financiero
+            if "Saldo Anterior" in line and ":" in line:
+                data["Resumen Financiero"]["Saldo Anterior"] = line.split(":")[1].strip()
+            if "Saldo Actual" in line and ":" in line:
+                data["Resumen Financiero"]["Saldo Actual"] = line.split(":")[1].strip()
 
     def extract_banorte_data(self):
         data = {"Información General": {}, "Transacciones": [], "Resumen Financiero": {}}
