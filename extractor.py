@@ -124,24 +124,24 @@ class PDFExtractor:
                 data["Resumen Financiero"]["Saldo Inicial"] = line.split(":")[1].strip()
             if "Saldo final" in line and ":" in line:
                 data["Resumen Financiero"]["Saldo Final"] = line.split(":")[1].strip()
-                
+
     def extract_bbase_data(self):
-        data = {"Información General": {}, "Transacciones": [], "Resumen Financiero": {}}
+        data = {"Información General": {}, "Transacciones": [], "Resumen Financiero": {}}
         with pdfplumber.open(self.file_path) as pdf:
             for page in pdf.pages:
-             text = page.extract_text()
-             if text:
+                text = page.extract_text()
+                if text:
                     self.process_bbase_text(text, data)
-            return data
-        
+        return data
+
     def process_bbase_text(self, text, data):
         lines = text.split("\n")
         for line in lines:
-            # Extraer información general
-            if "Número de Cuenta" in line and ":" in line:
-                data["Información General"]["Número de Cuenta"] = line.split(":")[1].strip()
+            # Extraer información general
+            if "Número de Cuenta" in line and ":" in line:
+                data["Información General"]["Número de Cuenta"] = line.split(":")[1].strip()
             if "RFC" in line and ":" in line:
-                data["Información General"]["RFC"] = line.split(":")[1].strip()
+                data["Información General"]["RFC"] = line.split(":")[1].strip()
 
             # Extraer transacciones
             if re.match(r"\d{2}-\w{3}-\d{2}", line):  # Fecha en formato DD-MMM-AA
@@ -210,6 +210,8 @@ class PDFExtractor:
                     df_trans = pd.DataFrame(data["Transacciones"], columns=["Fecha", "Descripción", "Depósitos", "Retiros"])
                 elif self.bank == "Scotiabank":
                     df_trans = pd.DataFrame(data["Transacciones"], columns=["Fecha", "Descripción", "Cargos", "Abonos"])
+                elif self.bank == "BBASE":
+                    df_trans = pd.DataFrame(data["Transacciones"], columns=["Fecha", "Concepto", "Cargo", "Abonos", "Saldo"])
                 elif self.bank == "Banorte":
                     df_trans = pd.DataFrame(data["Transacciones"], columns=["Fecha", "Descripción/Establecimiento", "Monto del Depósito", "Monto del Retiro", "Saldo"])
                 df_trans.to_excel(writer, sheet_name="Transacciones", index=False)
@@ -222,6 +224,6 @@ class PDFExtractor:
         print(f"Archivo guardado en: {output_path}")
 
 if __name__ == "__main__":
-    extractor = PDFExtractor("estado_de_cuenta.pdf", "Banorte")
+    extractor = PDFExtractor("estado_de_cuenta.pdf", "BBASE")
     data = extractor.extract_data()
     extractor.save_to_excel(data)
